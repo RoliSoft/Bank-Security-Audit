@@ -160,10 +160,14 @@ def printTabulated(res):
 
 """CLI handler methods."""
 
-def printInfo():
+def printUsage():
 	"""Prints usage information."""
 
-	print 'usage: ' + sys.argv[0] + ' [start|collect]'
+	print 'usage: ' + sys.argv[0] + ' [start|info|collect]'
+
+def printInfo():
+	"""Prints usage information from the API."""
+
 	inf = info()
 	print 'assessments: ' + str(inf['currentAssessments']) + '/' + str(inf['maxAssessments'])
 
@@ -189,13 +193,12 @@ def collectScans():
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		printInfo()
-		sys.exit()
-
-	if sys.argv[1] == 'start':
+		printUsage()
+	elif sys.argv[1] == 'start':
 		startScans()
+	elif sys.argv[1] == 'info':
+		printInfo()
 	elif sys.argv[1] == 'collect':
 		collectScans()
 	else:
-		printInfo()
-		sys.exit()
+		printUsage()
