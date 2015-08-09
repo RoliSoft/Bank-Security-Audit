@@ -107,7 +107,7 @@ def info():
 def parseEndpointObject(site, data):
 	"""Parses the Endpoint object returned by the API and extracts the relevant information."""
 
-	if data['progress'] != 100:
+	if data.get('progress', 0) != 100:
 		return None
 
 	return Result(
@@ -141,6 +141,10 @@ def parseEndpointObject(site, data):
 
 def printTabulated(res):
 	"""Prints the values from the specified Result argument into a tab-separated format."""
+
+	if not hasattr(res, 'Site'):
+		print 'test failed'
+		return
 
 	print '=image("' + res.Site.Icon + '", 4, 16, 16)\t' +\
 	      '=hyperlink("https://www.ssllabs.com/ssltest/analyze.html?d=' + res.Site.Host + '","' + res.Site.Name + '")\t' +\
