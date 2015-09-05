@@ -44,7 +44,7 @@ Sites = [
 	Site('BRD',                 'mybrdnet.ro',                              'https://www.brd.ro/sites/all/themes/webtheme/images/favicon.ico'),
 	Site('BCR',                 '24banking.ro',                             'https://www.bcr.ro/content/8ea9dd8a/-3b9c-429b-9f72-34e75b7512e3/favicon.ico'),
 	Site('Raiffeisen',          'raiffeisenonline.ro',                      'https://www.raiffeisen.ro/wps/contenthandler/!ut/p/digest!XHR_M-Rzf5C6GQ6vQGPqEA/dav/fs-type1/themes/ibm.portal.RZBInternet.80Theme/images/favicon.ico'),
-	Site('CEC',                 'ceconline.ro',                             'https://www.cec.ro/favicon.ico'),
+	Site('CEC',                 'www.ceconline.ro',                         'https://www.cec.ro/favicon.ico'),
 	Site('OTP',                 'otpdirekt.otpbank.ro',                     'https://otpdirekt.otpbank.ro/favicon.ico'),
 	Site('UniCredit Tiriac',    'ro.unicreditbanking.net',                  'https://www.unicredit-tiriac.ro/etc/designs/cee2020-pws-ro/favicon.ico'),
 	Site('Volksbank',           'www.volksbankromania.ro',                  'http://www.volksbank.ro/favicon.ico'),
@@ -55,7 +55,7 @@ Sites = [
 	Site('Banca Romaneasca',    'ib.brom.ro',                               'https://www.banca-romaneasca.ro/favicon.ico'),
 	Site('GarantiBank',         'ebank.garantibank.ro',                     'http://www.garantibank.ro/favicon.ico'),
 	Site('Intesa Sanpaolo',     'internetbanking.intesasanpaolobank.ro',    'https://www.intesasanpaolobank.ro/favicon.ico'),
-	Site('Carpatica',           'e-smart.carpatica.ro',                     'https://www.carpatica.ro/templates/fusion/favicon.ico'),
+	Site('Carpatica',           'e-smart.carpatica.ro',                     'https://www.carpatica.ro/wp-content/themes/carpatica/images/favicon.ico'),
 	Site('Marfin',              'ebanking.marfinbank.ro',                   'http://www.marfinbank.ro/favicon.ico'),
 	Site('Millenium',           'ind.millenniumbank.ro',                    'https://ind.millenniumbank.ro/favicon.ico'),
 	Site('Libra',               'secure.internetbanking.ro',                'http://www.librabank.ro/favicon.ico'),
@@ -124,7 +124,7 @@ def parseEndpointObject(site, data):
 		# True if Forward Secrecy is supported with most browsers
 		data['details']['forwardSecrecy'] == 2 or data['details']['forwardSecrecy'] == 4,
 		# True if not vulnerable to POODLE
-		not data['details']['poodle'],
+		not data['details']['poodle'] and data['details']['poodleTls'] != 2,
 		# True if not vulnerable to Heartbleed
 		not data['details']['heartbleed'],
 		# True if not vulnerable to FREAK
