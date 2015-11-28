@@ -4,10 +4,10 @@
 import sys, requests, socket
 from pprint import pprint
 
-"""Models for the script."""
+# Models for the script.
 
 class Site:
-	"""Represents a site."""
+	# Represents a site.
 
 	def __init__(self, Name, Host, Icon):
 		self.Name   = Name
@@ -15,7 +15,7 @@ class Site:
 		self.Icon   = Icon
 
 class Result:
-	"""Represents an endpoint evaluation."""
+	# Represents an endpoint evaluation.
 
 	def __init__(self, Site, Grade, SSLv3, TLSv12, SHA1, RC4, PFS, POODLE, Heartbleed, FREAK, Logjam, SCSV, HSTS, EV):
 		self.Site       = Site
@@ -33,7 +33,7 @@ class Result:
 		self.HSTS       = HSTS
 		self.EV         = EV
 
-"""Global variables."""
+# Global variables.
 
 API = "https://api.ssllabs.com/api/v2/"
 
@@ -62,10 +62,10 @@ Sites = [
 	Site('Banca Feroviara',     'bcfonline.bfer.ro',                        'http://www.bancaferoviara.ro/favicon.ico'),
 ]
 
-"""Methods for interacting with the SSL Labs API."""
+# Methods for interacting with the SSL Labs API.
 
 def request(path, payload = {}):
-	"""Sends a request to the global endpoint."""
+	# Sends a request to the global endpoint.
 
 	url = API + path
 	response = requests.get(url, params=payload)
@@ -74,7 +74,7 @@ def request(path, payload = {}):
 	return data
 
 def analyze(host, publish = "off", maxAge = 12, all = "done"):
-	"""Starts an analysis on the endpoint, if one was not done within the last maxAge hours."""
+	# Starts an analysis on the endpoint, if one was not done within the last maxAge hours.
 
 	path = "analyze"
 	payload = {'host': host, 'publish': publish, 'maxAge': maxAge}
@@ -83,7 +83,7 @@ def analyze(host, publish = "off", maxAge = 12, all = "done"):
 	return data
 
 def getEndpointData(host, s = None):
-	"""Fetches the results of the analysis for the specified endpoint."""
+	# Fetches the results of the analysis for the specified endpoint.
 
 	if s is None:
 		s = socket.gethostbyname(host)
@@ -95,17 +95,17 @@ def getEndpointData(host, s = None):
 	return data
 
 def info():
-	"""Fetches usage information from the API."""
+	# Fetches usage information from the API.
 
 	path = "info"
 	data = request(path)
 
 	return data
 
-"""Batch scanning helper methods and parser functions."""
+# Batch scanning helper methods and parser functions.
 
 def parseEndpointObject(site, data):
-	"""Parses the Endpoint object returned by the API and extracts the relevant information."""
+	# Parses the Endpoint object returned by the API and extracts the relevant information.
 
 	if data.get('progress', 0) != 100:
 		return None
@@ -140,50 +140,50 @@ def parseEndpointObject(site, data):
 	)
 
 def printTabulated(res):
-	"""Prints the values from the specified Result argument into a tab-separated format."""
+	# Prints the values from the specified Result argument into a tab-separated format.
 
 	if not hasattr(res, 'Site'):
 		print 'test failed'
 		return
 
 	print '=image("' + res.Site.Icon + '", 4, 16, 16)\t' +\
-	      '=hyperlink("https://www.ssllabs.com/ssltest/analyze.html?d=' + res.Site.Host + '","' + res.Site.Name + '")\t' +\
+		  '=hyperlink("https://www.ssllabs.com/ssltest/analyze.html?d=' + res.Site.Host + '","' + res.Site.Name + '")\t' +\
 		  res.Grade + '\t' +\
-	      ('Fail', 'Pass')[res.SSLv3]      + '\t' +\
-	      ('Fail', 'Pass')[res.TLSv12]     + '\t' +\
+		  ('Fail', 'Pass')[res.SSLv3]      + '\t' +\
+		  ('Fail', 'Pass')[res.TLSv12]     + '\t' +\
 		  ('Fail', 'Pass')[res.SHA1]       + '\t' +\
 		  ('Fail', 'Pass')[res.RC4]        + '\t' +\
 		  ('Fail', 'Pass')[res.PFS]        + '\t' +\
 		  ('Fail', 'Pass')[res.POODLE]     + '\t' +\
 		  ('Fail', 'Pass')[res.Heartbleed] + '\t' +\
-	      ('Fail', 'Pass')[res.FREAK]      + '\t' +\
-	      ('Fail', 'Pass')[res.Logjam]     + '\t' +\
-	      ('Fail', 'Pass')[res.SCSV]       + '\t' +\
-	      ('Fail', 'Pass')[res.HSTS]       + '\t' +\
-	      ('Fail', 'Pass')[res.EV]
+		  ('Fail', 'Pass')[res.FREAK]      + '\t' +\
+		  ('Fail', 'Pass')[res.Logjam]     + '\t' +\
+		  ('Fail', 'Pass')[res.SCSV]       + '\t' +\
+		  ('Fail', 'Pass')[res.HSTS]       + '\t' +\
+		  ('Fail', 'Pass')[res.EV]
 
-"""CLI handler methods."""
+# CLI handler methods.
 
 def printUsage():
-	"""Prints usage information."""
+	# Prints usage information.
 
 	print 'usage: ' + sys.argv[0] + ' [start|info|collect]'
 
 def printInfo():
-	"""Prints usage information from the API."""
+	# Prints usage information from the API.
 
 	inf = info()
 	print 'assessments: ' + str(inf['currentAssessments']) + '/' + str(inf['maxAssessments'])
 
 def startScans():
-	"""Starts the scan of all configured hosts."""
+	# Starts the scan of all configured hosts.
 
 	for site in Sites:
 		print 'Starting scan of ' + site.Name + '...'
 		analyze(site.Host)
 
 def collectScans():
-	"""Collects the analysis results for all configured hosts."""
+	# Collects the analysis results for all configured hosts.
 
 	for site in Sites:
 		res  = parseEndpointObject(site, getEndpointData(site.Host))
@@ -193,7 +193,7 @@ def collectScans():
 		else:
 			printTabulated(res)
 
-"""Entry point of the application."""
+# Entry point of the application.
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
