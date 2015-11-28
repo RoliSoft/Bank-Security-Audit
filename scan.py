@@ -57,7 +57,6 @@ Sites = [
 	Site('Intesa Sanpaolo',     'internetbanking.intesasanpaolobank.ro',    'https://www.intesasanpaolobank.ro/favicon.ico'),
 	Site('Carpatica',           'e-smart.carpatica.ro',                     'https://www.carpatica.ro/wp-content/themes/carpatica/images/favicon.ico'),
 	Site('Marfin',              'ebanking.marfinbank.ro',                   'http://www.marfinbank.ro/favicon.ico'),
-	Site('Millenium',           'ind.millenniumbank.ro',                    'https://ind.millenniumbank.ro/favicon.ico'),
 	Site('Libra',               'secure.internetbanking.ro',                'http://www.librabank.ro/favicon.ico'),
 	Site('Banca Feroviara',     'bcfonline.bfer.ro',                        'http://www.bancaferoviara.ro/favicon.ico'),
 ]
