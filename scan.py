@@ -42,7 +42,7 @@ Sites = [
 	Site('BT',                  'ib.btrl.ro',                               'https://www.bancatransilvania.ro/favicon.ico'),
 	Site('ING',                 'homebank.ro',                              'https://www.ing.ro/favicon.ico'),
 	Site('BRD',                 'mybrdnet.ro',                              'https://www.brd.ro/sites/all/themes/webtheme/images/favicon.ico'),
-	Site('BCR',                 '24banking.ro',                             'https://www.bcr.ro/content/8ea9dd8a/-3b9c-429b-9f72-34e75b7512e3/favicon.ico'),
+	Site('BCR',                 '24banking.ro',                             'https://www.bcr.ro/content/dam/ro/bcr/common/bcr-favicon.ico'),
 	Site('Raiffeisen',          'raiffeisenonline.ro',                      'https://www.raiffeisen.ro/wps/contenthandler/!ut/p/digest!XHR_M-Rzf5C6GQ6vQGPqEA/dav/fs-type1/themes/ibm.portal.RZBInternet.80Theme/images/favicon.ico'),
 	Site('CEC',                 'www.ceconline.ro',                         'https://www.cec.ro/favicon.ico'),
 	Site('OTP',                 'otpdirekt.otpbank.ro',                     'https://otpdirekt.otpbank.ro/favicon.ico'),
@@ -56,7 +56,7 @@ Sites = [
 	Site('GarantiBank',         'ebank.garantibank.ro',                     'http://www.garantibank.ro/favicon.ico'),
 	Site('Intesa Sanpaolo',     'internetbanking.intesasanpaolobank.ro',    'https://www.intesasanpaolobank.ro/favicon.ico'),
 	Site('Carpatica',           'e-smart.carpatica.ro',                     'https://www.carpatica.ro/wp-content/themes/carpatica/images/favicon.ico'),
-	Site('Marfin',              'ebanking.marfinbank.ro',                   'http://www.marfinbank.ro/favicon.ico'),
+	Site('Marfin',              'ebanking.marfinbank.ro',                   'http://www.marfinbank.ro/SiteAssets/favicon.ico'),
 	Site('Libra',               'secure.internetbanking.ro',                'http://www.librabank.ro/favicon.ico'),
 	Site('Banca Feroviara',     'bcfonline.bfer.ro',                        'http://www.bancaferoviara.ro/favicon.ico'),
 ]
