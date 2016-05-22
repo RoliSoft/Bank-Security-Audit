@@ -40,10 +40,10 @@ API = "https://api.ssllabs.com/api/v2/"
 Sites = [
 	#     Name                   Hostname                                    Favicon
 	Site('BT',                  'ib.btrl.ro',                               'https://www.bancatransilvania.ro/favicon.ico'),
-	Site('ING',                 'homebank.ro',                              'https://www.ing.ro/favicon.ico'),
+	Site('ING',                 'www.homebank.ro',                          'https://www.ing.ro/favicon.ico'),
 	Site('BRD',                 'mybrdnet.ro',                              'https://www.brd.ro/sites/all/themes/webtheme/images/favicon.ico'),
 	Site('BCR',                 '24banking.ro',                             'https://www.bcr.ro/content/dam/ro/bcr/common/bcr-favicon.ico'),
-	Site('Raiffeisen',          'raiffeisenonline.ro',                      'https://www.raiffeisen.ro/favicon.ico'),
+	Site('Raiffeisen',          'www.raiffeisenonline.ro',                  'https://www.raiffeisen.ro/favicon.ico'),
 	Site('CEC',                 'www.ceconline.ro',                         'https://www.cec.ro/favicon.ico'),
 	Site('OTP',                 'otpdirekt.otpbank.ro',                     'https://otpdirekt.otpbank.ro/favicon.ico'),
 	Site('UniCredit Tiriac',    'ro.unicreditbanking.net',                  'https://www.unicredit-tiriac.ro/etc/designs/cee2020-pws-ro/favicon.ico'),
