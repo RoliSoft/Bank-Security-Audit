@@ -45,7 +45,7 @@ Sites = [
 	Site('BCR',                 '24banking.ro',                             'https://www.bcr.ro/content/dam/ro/bcr/common/bcr-favicon.ico'),
 	Site('Raiffeisen',          'www.raiffeisenonline.ro',                  'https://www.raiffeisen.ro/favicon.ico'),
 	Site('CEC',                 'www.ceconline.ro',                         'https://www.cec.ro/favicon.ico'),
-	Site('OTP',                 'otpdirekt.otpbank.ro',                     'https://otpdirekt.otpbank.ro/favicon.ico'),
+	Site('OTP',                 'www.otpdirekt.ro',                         'https://www.otpbank.ro/assets/img/favicon.ico'),
 	Site('UniCredit Tiriac',    'ro.unicreditbanking.net',                  'https://www.unicredit-tiriac.ro/etc/designs/cee2020-pws-ro/favicon.ico'),
 	Site('AlphaBank',           'www.alphaclick.ro',                        'https://www.alphabank.ro/favicon.ico'),
 	Site('Bancpost',            'fastbanking.bancpost.ro',                  'https://www.bancpost.ro/Images/icon-bancpost.png'),
