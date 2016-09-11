@@ -12,7 +12,7 @@ After configuration, you can start the scan by running `scan.py start`. By defau
 
 You can check in on the progress by running `scan.py info`, which will print the number of assessments still running that have been started by the script. When you see `0/25` it means all the assessments have finished, and you can either start the next batch of 25 or collect the results.
 
-To collect the results, run `scan.py collect` which will fetch the assessment results and print it in a tabulated fashion, which you can paste into Google Sheets.
+To collect the results, run `scan.py collect [file]` which will fetch the assessment results and print it in a tabulated fashion, which you can paste into Google Sheets.
 
 In Google Sheets, you can set up rules for Conditional Formatting in order to automatically color the "Pass"/"Fail" cells and the grades.
 
@@ -22,7 +22,7 @@ The spreadsheet with the results of the Romanian banks can be accessed here: htt
 
 I will try to update the spreadsheet above monthly, unless there was no change from last month's results. It should be interesting to see how their security evolves over time, and especially, how fast do banks react to patching 0-day TLS vulnerabilities, if they do at all.
 
-The banks being tested by [Qualys SSL Labs](https://www.ssllabs.com/ssltest/) are:
+The banks being tested by [Qualys SSL Labs](https://www.ssllabs.com/ssltest/) and [Mozilla Observatory](https://observatory.mozilla.org/) are:
 
 * [Banca Transilvania (BT)](https://ro.wikipedia.org/wiki/Banca_Transilvania)
 * [ING Bank](https://ro.wikipedia.org/wiki/ING_Bank_Rom%C3%A2nia)
@@ -31,8 +31,7 @@ The banks being tested by [Qualys SSL Labs](https://www.ssllabs.com/ssltest/) ar
 * [Raiffeisen Bank](https://ro.wikipedia.org/wiki/Raiffeisen_Bank_Rom%C3%A2nia)
 * [CEC Bank](https://ro.wikipedia.org/wiki/CEC_Bank)
 * [OTP Bank](https://ro.wikipedia.org/wiki/OTP_Bank_Rom%C3%A2nia)
-* [UniCredit Țiriac Bank](https://ro.wikipedia.org/wiki/UniCredit_%C8%9Airiac_Bank)
-* [Volksbank](https://ro.wikipedia.org/wiki/Volksbank_Rom%C3%A2nia)
+* [UniCredit Bank](https://ro.wikipedia.org/wiki/UniCredit_Bank_Rom%C3%A2nia)
 * [Alpha Bank](https://ro.wikipedia.org/wiki/Alpha_Bank_Rom%C3%A2nia)
 * [Bancpost](https://ro.wikipedia.org/wiki/Bancpost)
 * [Piraeus Bank](https://ro.wikipedia.org/wiki/Piraeus_Bank_Rom%C3%A2nia)
