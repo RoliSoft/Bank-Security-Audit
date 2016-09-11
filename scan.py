@@ -53,18 +53,18 @@ Sites = [
 	Site('Raiffeisen',          'www.raiffeisenonline.ro',                  'https://www.raiffeisen.ro/favicon.ico'),
 	Site('CEC',                 'www.ceconline.ro',                         'https://www.cec.ro/favicon.ico'),
 	Site('OTP',                 'www.otpdirekt.ro',                         'https://www.otpbank.ro/assets/img/favicon.ico'),
-	Site('UniCredit Tiriac',    'ro.unicreditbanking.net',                  'https://www.unicredit-tiriac.ro/etc/designs/cee2020-pws-ro/favicon.ico'),
+	Site('UniCredit',           'ro.unicreditbanking.net',                  'https://www.unicredit-tiriac.ro/etc/designs/cee2020-pws-ro/favicon.ico'),
 	Site('AlphaBank',           'www.alphaclick.ro',                        'https://www.alphabank.ro/favicon.ico'),
 	Site('Bancpost',            'fastbanking.bancpost.ro',                  'https://www.bancpost.ro/Images/icon-bancpost.png'),
 	Site('Piraeus',             'www.piraeusbank.com',                      'http://www.piraeusbank.ro/Images/icon.png'),
 	Site('Credit Europe',       'net.crediteurope.ro',                      'https://www.crediteurope.ro/favicon.gif'),
-	Site('Banca Romaneasca',    'ib.brom.ro',                               'https://www.banca-romaneasca.ro/favicon.ico'),
+	Site('Banca Românească',    'ib.brom.ro',                               'https://www.banca-romaneasca.ro/favicon.ico'),
 	Site('GarantiBank',         'ebank.garantibank.ro',                     'http://www.garantibank.ro/favicon.ico'),
 	Site('Intesa Sanpaolo',     'internetbanking.intesasanpaolobank.ro',    'https://www.intesasanpaolobank.ro/favicon.ico'),
 	Site('Carpatica',           'e-smart.carpatica.ro',                     'https://www.carpatica.ro/wp-content/themes/carpatica/images/favicon.ico'),
 	Site('Marfin',              'ebanking.marfinbank.ro',                   'http://www.marfinbank.ro/SiteAssets/favicon.ico'),
 	Site('Libra',               'secure.internetbanking.ro',                'http://www.librabank.ro/favicon.ico'),
-	Site('Banca Feroviara',     'bcfonline.bfer.ro',                        'http://www.bancaferoviara.ro/favicon.ico'),
+	Site('Banca Feroviară',     'bcfonline.bfer.ro',                        'http://www.bancaferoviara.ro/favicon.ico'),
 ]
 
 # Methods for interacting with the SSL Labs API.
@@ -194,33 +194,37 @@ def parseEndpointObject(site, qualys, mozilla):
 
 	)
 
-def printTabulated(res):
+def printTabulated(res, file):
 	"""
 	Prints the values from the specified Result argument into a tab-separated format.
 	"""
 
 	if not hasattr(res, 'Site'):
-		print('=image("' + res.Icon + '", 4, 16, 16)\t' +
-		      '=hyperlink("https://www.ssllabs.com/ssltest/analyze.html?d=' + res.Host + '","' + res.Name + '")\t' +
-		      '!\t' + res.Error)
+		file.write(
+			'=image("' + res.Icon + '", 4, 16, 16)\t' +
+			'=hyperlink("https://www.ssllabs.com/ssltest/analyze.html?d=' + res.Host + '","' + res.Name + '")\t' +
+			'!\t' + res.Error + '\n'
+		)
 		return
 
-	print('=image("' + res.Site.Icon + '", 4, 16, 16)\t' +
-	      '=hyperlink("https://www.ssllabs.com/ssltest/analyze.html?d=' + res.Site.Host + '","' + res.Site.Name + '")\t' +
-	      res.Grade + '\t' +
-	      str(res.Score) + '%\t' +
-	      ('Fail', 'Pass')[res.SSLv3] + '\t' +
-	      ('Fail', 'Pass')[res.TLSv12] + '\t' +
-	      ('Fail', 'Pass')[res.SHA1] + '\t' +
-	      ('Fail', 'Pass')[res.RC4] + '\t' +
-	      ('Fail', 'Pass')[res.PFS] + '\t' +
-	      ('Fail', 'Pass')[res.POODLE] + '\t' +
-	      ('Fail', 'Pass')[res.Heartbleed] + '\t' +
-	      ('Fail', 'Pass')[res.FREAK] + '\t' +
-	      ('Fail', 'Pass')[res.Logjam] + '\t' +
-	      ('Fail', 'Pass')[res.SCSV] + '\t' +
-	      ('Fail', 'Pass')[res.HSTS] + '\t' +
-	      ('Fail', 'Pass')[res.EV])
+	file.write(
+		'=image("' + res.Site.Icon + '", 4, 16, 16)\t' +
+		'=hyperlink("https://www.ssllabs.com/ssltest/analyze.html?d=' + res.Site.Host + '","' + res.Site.Name + '")\t' +
+		res.Grade + '\t' +
+		str(res.Score) + '\t' +
+		('Fail', 'Pass')[res.SSLv3] + '\t' +
+		('Fail', 'Pass')[res.TLSv12] + '\t' +
+		('Fail', 'Pass')[res.SHA1] + '\t' +
+		('Fail', 'Pass')[res.RC4] + '\t' +
+		('Fail', 'Pass')[res.PFS] + '\t' +
+		('Fail', 'Pass')[res.POODLE] + '\t' +
+		('Fail', 'Pass')[res.Heartbleed] + '\t' +
+		('Fail', 'Pass')[res.FREAK] + '\t' +
+		('Fail', 'Pass')[res.Logjam] + '\t' +
+		('Fail', 'Pass')[res.SCSV] + '\t' +
+		('Fail', 'Pass')[res.HSTS] + '\t' +
+		('Fail', 'Pass')[res.EV] + '\n'
+	)
 
 # CLI handler methods.
 
@@ -254,15 +258,28 @@ def startScans():
 		else:
 			print(status + '...')
 
-def collectScans():
+def collectScans(path = None):
 	"""
 	Collects the analysis results for all configured hosts.
 	"""
 
+	if path and path != '-':
+		file = open(path, 'w')
+	else:
+		file = sys.stdout
+
 	for site in Sites:
+		if file is not sys.stdout:
+			print('collecting ' + site.Name + '...')
+
 		qualys, mozilla = getEndpointData(site.Host)
 		res = parseEndpointObject(site, qualys, mozilla)
-		printTabulated(res)
+
+		printTabulated(res, file)
+		file.flush()
+
+	if file is not sys.stdout:
+		file.close()
 
 # Entry point of the application.
 
@@ -274,6 +291,6 @@ if __name__ == "__main__":
 	elif sys.argv[1] == 'info':
 		printInfo()
 	elif sys.argv[1] == 'collect':
-		collectScans()
+		collectScans(sys.argv[2] if len(sys.argv) > 2 else None)
 	else:
 		printUsage()
