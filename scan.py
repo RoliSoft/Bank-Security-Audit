@@ -22,9 +22,10 @@ class Result:
 	Represents an endpoint evaluation.
 	"""
 
-	def __init__(self, Site, Grade, SSLv3, TLSv12, SHA1, RC4, PFS, POODLE, Heartbleed, FREAK, Logjam, SCSV, HSTS, EV):
+	def __init__(self, Site, Grade, Score, SSLv3, TLSv12, SHA1, RC4, PFS, POODLE, Heartbleed, FREAK, Logjam, SCSV, HSTS, EV):
 		self.Site       = Site
 		self.Grade      = Grade
+		self.Score      = Score
 		self.SSLv3      = SSLv3
 		self.TLSv12     = TLSv12
 		self.SHA1       = SHA1
@@ -40,7 +41,8 @@ class Result:
 
 # Global variables.
 
-QualysAPI = "https://api.ssllabs.com/api/v2/"
+QualysAPI  = 'https://api.ssllabs.com/api/v2/'
+MozillaAPI = 'https://http-observatory.security.mozilla.org/api/v1/'
 
 Sites = [
 	#     Name                   Hostname                                    Favicon
@@ -67,35 +69,40 @@ Sites = [
 
 # Methods for interacting with the SSL Labs API.
 
-def request(url, payload = {}):
+def request(url, payload = {}, post = False):
 	"""
 	Sends a request to the global endpoint.
 	"""
 
-	response = requests.get(url, params=payload)
-	data = response.json()
+	func = requests.get if not post else requests.post
+	resp = func(url, params=payload)
+	data = resp.json()
 
 	return data
 
-def analyze(host, publish = "off", maxAge = 12, all = "done"):
+def analyze(host, publish = "off", maxAge = 12):
 	"""
 	Starts an analysis on the endpoint, if one was not done within the last maxAge hours.
 	"""
 
-	payload = {'host': host, 'publish': publish, 'maxAge': maxAge}
-	data    = request(QualysAPI + 'analyze', payload)
+	qualys = request(QualysAPI + 'analyze', {'host': host, 'publish': publish, 'maxAge': maxAge})
+	ready  = qualys['status'] == 'READY'
 
-	ready  = data['status'] == 'READY'
-
-	if 'statusMessage' in data:
-		status = data['statusMessage']
-	elif 'endpoints' in data:
-		if 'statusDetailsMessage' in data['endpoints'][0]:
-			status = data['endpoints'][0]['statusDetailsMessage']
+	if 'statusMessage' in qualys:
+		status = qualys['statusMessage']
+	elif 'endpoints' in qualys:
+		if 'statusDetailsMessage' in qualys['endpoints'][0]:
+			status = qualys['endpoints'][0]['statusDetailsMessage']
 		else:
-			status = data['endpoints'][0]['statusMessage']
+			status = qualys['endpoints'][0]['statusMessage']
 	else:
 		status = 'Unknown'
+
+	mozilla = request(MozillaAPI + 'analyze', {'host': host, 'hidden': 'true' if publish == 'off' else 'false'}, True)
+	ready   = ready and mozilla['state'] == 'FINISHED'
+
+	if not ready and (not status or status == 'Ready'):
+		status = 'Observatory state: ' + mozilla['state']
 
 	return ready, status
 
@@ -107,10 +114,10 @@ def getEndpointData(host, s = None):
 	if s is None:
 		s = socket.gethostbyname(host)
 
-	payload = {'host': host, 's': s}
-	data    = request(QualysAPI + 'getEndpointData', payload)
+	qualys  = request(QualysAPI + 'getEndpointData', {'host': host, 's': s})
+	mozilla = request(MozillaAPI + 'analyze', {'host': host})
 
-	return data
+	return qualys, mozilla
 
 def info():
 	"""
@@ -123,60 +130,67 @@ def info():
 
 # Batch scanning helper methods and parser functions.
 
-def parseEndpointObject(site, data):
+def parseEndpointObject(site, qualys, mozilla):
 	"""
 	Parses the Endpoint object returned by the API and extracts the relevant information.
 	"""
 
-	# pprint(data)
+	# pprint([qualys, mozilla])
 
-	if data.get('progress', 0) != 100:
+	if 'progress' not in qualys or qualys['progress'] != 100:
 
-		if 'errors' in data:
-			site.Error = data['errors'][0]['message']
+		if 'errors' in qualys:
+			site.Error = qualys['errors'][0]['message']
+
+		return site
+
+	if 'state' not in mozilla or mozilla['state'] != 'FINISHED':
+
+		if 'error' in mozilla:
+			site.Error = mozilla['error']
 
 		return site
 
 	return Result(
 
 		# Metadata
-		site, data['grade'],
+		site, qualys['grade'], mozilla['score'],
 
 		# True if server does not support SSLv3
-		not any(prot['name'] == 'SSL' for prot in data['details']['protocols']),
+		not any(prot['name'] == 'SSL' for prot in qualys['details']['protocols']),
 
 		# True if server supports TLSv1.2
-		any(prot['id'] == 771 for prot in data['details']['protocols']),
+		any(prot['id'] == 771 for prot in qualys['details']['protocols']),
 
 		# True if certificate is not signed with SHA1
-		data['details']['cert']['sigAlg'] != 'SHA1withRSA',
+		qualys['details']['cert']['sigAlg'] != 'SHA1withRSA',
 
 		# True if RC4 is not supported
-		not data['details']['supportsRc4'],
+		not qualys['details']['supportsRc4'],
 
 		# True if Forward Secrecy is supported with most browsers
-		data['details']['forwardSecrecy'] == 2 or data['details']['forwardSecrecy'] == 4,
+		qualys['details']['forwardSecrecy'] == 2 or qualys['details']['forwardSecrecy'] == 4,
 
 		# True if not vulnerable to POODLE
-		not data['details']['poodle'] and data['details']['poodleTls'] != 2,
+		not qualys['details']['poodle'] and qualys['details']['poodleTls'] != 2,
 
 		# True if not vulnerable to Heartbleed
-		not data['details']['heartbleed'],
+		not qualys['details']['heartbleed'],
 
 		# True if not vulnerable to FREAK
-		not data['details']['freak'],
+		not qualys['details']['freak'],
 
 		# True if not vulnerable to Logjam
-		not data['details'].get('logjam', False),
+		not qualys['details'].get('logjam', False),
 
 		# True if server supports TLS_FALLBACK_SCSV
-		data['details'].get('fallbackScsv', False),
+		qualys['details'].get('fallbackScsv', False),
 
 		# True if server sends HSTS
-		not not data['details'].get('stsResponseHeader', None),
+		not not qualys['details'].get('stsResponseHeader', None),
 
 		# True if cert is EV
-		data['details']['cert'].get('validationType', None) == 'E'
+		qualys['details']['cert'].get('validationType', None) == 'E'
 
 	)
 
@@ -194,6 +208,7 @@ def printTabulated(res):
 	print('=image("' + res.Site.Icon + '", 4, 16, 16)\t' +
 	      '=hyperlink("https://www.ssllabs.com/ssltest/analyze.html?d=' + res.Site.Host + '","' + res.Site.Name + '")\t' +
 	      res.Grade + '\t' +
+	      str(res.Score) + '%\t' +
 	      ('Fail', 'Pass')[res.SSLv3] + '\t' +
 	      ('Fail', 'Pass')[res.TLSv12] + '\t' +
 	      ('Fail', 'Pass')[res.SHA1] + '\t' +
@@ -245,7 +260,8 @@ def collectScans():
 	"""
 
 	for site in Sites:
-		res = parseEndpointObject(site, getEndpointData(site.Host))
+		qualys, mozilla = getEndpointData(site.Host)
+		res = parseEndpointObject(site, qualys, mozilla)
 		printTabulated(res)
 
 # Entry point of the application.
