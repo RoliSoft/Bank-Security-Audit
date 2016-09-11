@@ -22,19 +22,16 @@ class Result:
 	Represents an endpoint evaluation.
 	"""
 
-	def __init__(self, Site, Grade, Score, SSLv3, TLSv12, SHA1, RC4, PFS, POODLE, Heartbleed, FREAK, Logjam, SCSV, HSTS, EV):
+	def __init__(self, Site, Grade, Score, Vulns, SSLv3, TLSv12, SHA1, RC4, PFS, SCSV, HSTS, EV):
 		self.Site       = Site
 		self.Grade      = Grade
 		self.Score      = Score
+		self.Vulns      = Vulns
 		self.SSLv3      = SSLv3
 		self.TLSv12     = TLSv12
 		self.SHA1       = SHA1
 		self.RC4        = RC4
 		self.PFS        = PFS
-		self.POODLE     = POODLE
-		self.Heartbleed = Heartbleed
-		self.FREAK      = FREAK
-		self.Logjam     = Logjam
 		self.SCSV       = SCSV
 		self.HSTS       = HSTS
 		self.EV         = EV
@@ -99,10 +96,10 @@ def analyze(host, publish = "off", maxAge = 12):
 		status = 'Unknown'
 
 	mozilla = request(MozillaAPI + 'analyze', {'host': host, 'hidden': 'true' if publish == 'off' else 'false'}, True)
-	ready   = ready and mozilla['state'] == 'FINISHED'
+	ready   = ready and ('state' in mozilla and mozilla['state'] == 'FINISHED')
 
 	if not ready and (not status or status == 'Ready'):
-		status = 'Observatory state: ' + mozilla['state']
+		status = 'Observatory state: ' + (mozilla['state'] if 'state' in mozilla else mozilla['error'] if 'error' in mozilla else 'Unknown')
 
 	return ready, status
 
@@ -137,6 +134,8 @@ def parseEndpointObject(site, qualys, mozilla):
 
 	# pprint([qualys, mozilla])
 
+	# check for errors
+
 	if 'progress' not in qualys or qualys['progress'] != 100:
 
 		if 'errors' in qualys:
@@ -146,15 +145,50 @@ def parseEndpointObject(site, qualys, mozilla):
 
 	if 'state' not in mozilla or mozilla['state'] != 'FINISHED':
 
-		if 'error' in mozilla:
-			site.Error = mozilla['error']
+		# if 'error' in mozilla:
+		# 	site.Error = mozilla['error']
+		#
+		# return site
 
-		return site
+		mozilla['score'] = '!'
+
+	# build list of vulnerabilities
+
+	vulns = []
+
+	if qualys['details']['poodle']:
+		vulns += ['POODLE']
+
+	if qualys['details']['poodleTls'] == 2:
+		vulns += ['POODLE TLS']
+
+	if qualys['details']['heartbleed']:
+		vulns += ['Heartbleed']
+
+	if qualys['details']['freak']:
+		vulns += ['FREAK']
+
+	if qualys['details']['logjam']:
+		vulns += ['Logjam']
+
+	if qualys['details']['vulnBeast']:
+		vulns += ['BEAST']
+
+	if qualys['details']['openSslCcs'] >= 2:
+		vulns += ['CCS Injection']
+
+	if qualys['details']['openSSLLuckyMinus20'] == 2:
+		vulns += ['LuckyMinus20']
+
+	if qualys['details']['drownVulnerable']:
+		vulns += ['DROWN']
+
+	# build final object
 
 	return Result(
 
 		# Metadata
-		site, qualys['grade'], mozilla['score'],
+		site, qualys['grade'], mozilla['score'], vulns,
 
 		# True if server does not support SSLv3
 		not any(prot['name'] == 'SSL' for prot in qualys['details']['protocols']),
@@ -170,18 +204,6 @@ def parseEndpointObject(site, qualys, mozilla):
 
 		# True if Forward Secrecy is supported with most browsers
 		qualys['details']['forwardSecrecy'] == 2 or qualys['details']['forwardSecrecy'] == 4,
-
-		# True if not vulnerable to POODLE
-		not qualys['details']['poodle'] and qualys['details']['poodleTls'] != 2,
-
-		# True if not vulnerable to Heartbleed
-		not qualys['details']['heartbleed'],
-
-		# True if not vulnerable to FREAK
-		not qualys['details']['freak'],
-
-		# True if not vulnerable to Logjam
-		not qualys['details'].get('logjam', False),
 
 		# True if server supports TLS_FALLBACK_SCSV
 		qualys['details'].get('fallbackScsv', False),
@@ -217,13 +239,10 @@ def printTabulated(res, file):
 		('Fail', 'Pass')[res.SHA1] + '\t' +
 		('Fail', 'Pass')[res.RC4] + '\t' +
 		('Fail', 'Pass')[res.PFS] + '\t' +
-		('Fail', 'Pass')[res.POODLE] + '\t' +
-		('Fail', 'Pass')[res.Heartbleed] + '\t' +
-		('Fail', 'Pass')[res.FREAK] + '\t' +
-		('Fail', 'Pass')[res.Logjam] + '\t' +
 		('Fail', 'Pass')[res.SCSV] + '\t' +
 		('Fail', 'Pass')[res.HSTS] + '\t' +
-		('Fail', 'Pass')[res.EV] + '\n'
+		('Fail', 'Pass')[res.EV] + '\t' +
+		('None' if len(res.Vulns) == 0 else ', '.join(res.Vulns)) + '\n'
 	)
 
 # CLI handler methods.
