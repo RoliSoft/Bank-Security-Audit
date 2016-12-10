@@ -44,7 +44,7 @@ MozillaAPI = 'https://http-observatory.security.mozilla.org/api/v1/'
 Sites = [
 	#     Name                   Hostname                                    Favicon
 	Site('BT',                  'ib.btrl.ro',                               'https://www.bancatransilvania.ro/favicon.ico'),
-	Site('ING',                 'www.homebank.ro',                          'https://www.ing.ro/favicon.ico'),
+	Site('ING',                 'www.homebank.ro',                          'https://www.homebank.ro/favicon.ico'),
 	Site('BRD',                 'mybrdnet.ro',                              'https://www.brd.ro/sites/all/themes/webtheme/images/favicon.ico'),
 	Site('BCR',                 '24banking.ro',                             'https://www.bcr.ro/content/dam/ro/bcr/common/bcr-favicon.ico'),
 	Site('Raiffeisen',          'www.raiffeisenonline.ro',                  'https://www.raiffeisen.ro/favicon.ico'),
